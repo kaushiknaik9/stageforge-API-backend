@@ -8,15 +8,16 @@ const {
 } = require("../controllers/product.controller");
 
 const validateProduct = require("../middlewares/validateProduct");
+const protect = require("../middlewares/auth.middleware");
 
 router = express.Router();
 
-router.get("/", getproducts);
+router.get("/", protect, getproducts);
 
-router.post("/", validateProduct, createproducts);
+router.post("/", protect, validateProduct, createproducts);
 
-router.patch("/:id", validateProduct, updateproduct);
+router.patch("/:id", protect, updateproduct);
 
-router.get("/:id", deleteproduct);
+router.delete("/:id", deleteproduct);
 
 module.exports = router;

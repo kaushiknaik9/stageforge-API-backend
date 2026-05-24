@@ -1,45 +1,53 @@
-products = [];
+const Products = require("../models/product.model");
+const asynchandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
 
-const getproducts = (req, res) => {
+const getproducts = asynchandler(async (req, res) => {
+  const product = await Products.find().populate("createdBy, name mail");
+
   res.status(200).json({
     success: true,
+    data: product,
     message: "Products Fetched Successfully",
   });
-};
+});
 
-const createproducts = (req, res) => {
-  const newproduct = {
-    id: Date.now(),
+const createproducts = asynchandler(async (req, res) => {
+  const product = await Products.create({
     ...req.body,
-  };
-
-  products.push(newproduct);
+    createdBy: req.user.id,
+  });
 
   res.status(201).json({
     success: true,
+    data: product,
     message: "Project Created and stored !!",
   });
-};
+});
 
-const updateproduct = (req, res) => {
-  id = req.params.id;
+const updateproduct = asynchandler(async (req, res) => {
+  const product = await Products.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
 
-  products = products.map((product) =>
-    product.id == id ? { ...product, ...req.body } : product,
-  );
-
+  if (!product) {
+    throw new AppError("Product not Found", 404);
+  }
   res.status(201).json({
     success: true,
+    data: product,
     message: "Product Updated Success",
   });
-};
+});
 
 const deleteproduct = (req, res) => {
-  id = req.params.id;
+  const product = Products.findByIdAndDelete(req.params.id);
 
-  products = products.filter((product) => product.id != id);
+  if (!product) {
+    throw new AppError("Product Not Found", 404);
+  }
 
-  res.status(204).json({
+  res.status(200).json({
     success: true,
     message: "Product Deleted Success",
   });
