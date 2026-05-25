@@ -1,14 +1,14 @@
 const Products = require("../models/product.model");
 const asynchandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
+const getAllProduct = require("../services/product.service");
 
 const getproducts = asynchandler(async (req, res) => {
-  const product = await Products.find().populate("createdBy, name mail");
+  const product = await getAllProduct(req.query);
 
   res.status(200).json({
     success: true,
     data: product,
-    message: "Products Fetched Successfully",
   });
 });
 
@@ -40,8 +40,8 @@ const updateproduct = asynchandler(async (req, res) => {
   });
 });
 
-const deleteproduct = (req, res) => {
-  const product = Products.findByIdAndDelete(req.params.id);
+const deleteproduct = asynchandler(async (req, res) => {
+  const product = await Products.findByIdAndDelete(req.params.id);
 
   if (!product) {
     throw new AppError("Product Not Found", 404);
@@ -51,5 +51,5 @@ const deleteproduct = (req, res) => {
     success: true,
     message: "Product Deleted Success",
   });
-};
+});
 module.exports = { getproducts, createproducts, updateproduct, deleteproduct };

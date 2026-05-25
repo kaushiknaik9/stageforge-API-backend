@@ -10,7 +10,7 @@ const {
 const validateProduct = require("../middlewares/validateProduct");
 const protect = require("../middlewares/auth.middleware");
 
-router = express.Router();
+const router = express.Router();
 
 router.get("/", protect, getproducts);
 

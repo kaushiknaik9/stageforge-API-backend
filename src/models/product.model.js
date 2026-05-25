@@ -11,6 +11,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
     },
@@ -27,6 +31,10 @@ const productSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+productSchema.index({
+  name: "text",
+});
 
 const Products = mongoose.model("Product", productSchema);
 

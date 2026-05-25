@@ -2,11 +2,11 @@ const jwt = require("jsonwebtoken");
 
 const protect = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorisation;
+    const authHeader = req.headers.authorization;
 
     if (!authHeader) {
       return res.status(401).json({
-        success: true,
+        success: false,
         message: "No Token for Authorisation",
       });
     }
@@ -16,6 +16,7 @@ const protect = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;
+    next();
   } catch (e) {
     res.status(401).json({
       success: false,
