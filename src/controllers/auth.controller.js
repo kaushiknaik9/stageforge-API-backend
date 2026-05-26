@@ -1,6 +1,8 @@
 const AppError = require("../utils/AppError");
 const asynchandler = require("../utils/asyncHandler");
 
+const emailQueue = require("../queues/email.queue");
+
 const Users = require("../models/user.model");
 
 const bcrypt = require("bcryptjs");
@@ -23,6 +25,10 @@ const registeruser = asynchandler(async (req, res) => {
     name,
     email,
     password: hashedpassword,
+  });
+
+  await emailQueue.add("sendWelcomeEmail", {
+    email: user.email,
   });
 
   res.status(201).json({

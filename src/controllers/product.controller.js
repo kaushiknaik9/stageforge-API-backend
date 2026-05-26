@@ -2,12 +2,26 @@ const Products = require("../models/product.model");
 const asynchandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const getAllProduct = require("../services/product.service");
+const redisCache = require("../config/redis");
 
 const getproducts = asynchandler(async (req, res) => {
+  const cacheKey = `products:${JSON.stringify(req.query)}`;
+  const cachedProducts = await redisCache.get("products");
+
+  if (cachedProducts) {
+    return res.status(200).json({
+      success: true,
+      source: "redis-cache",
+      data: JSON.parse(cachedProducts),
+    });
+  }
   const product = await getAllProduct(req.query);
+
+  await redisCache.set(cacheKey, JSON.stringify(product), { EX: 60 });
 
   res.status(200).json({
     success: true,
+    source: "mongo",
     data: product,
   });
 });
